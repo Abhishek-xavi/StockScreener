@@ -20,6 +20,13 @@ jobs:
           python-version: '3.11'
           cache: pip
 
+      - name: Restore posted-tweets log
+        uses: actions/cache@v4
+        with:
+          path: logs/posted_tweets.log
+          key: posted-tweets-log
+          restore-keys: posted-tweets-log
+
       - name: Install Chrome
         uses: browser-actions/setup-chrome@v1
         with:
@@ -47,8 +54,15 @@ jobs:
           GMAIL_TO: ${{ secrets.GMAIL_TO }}
         run: python main.py --headless
 
+      - name: Save posted-tweets log
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: logs/posted_tweets.log
+          key: posted-tweets-log
+
       - name: Upload logs
-        if: always()           # Upload logs even if the run fails
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: screener-logs-${{ github.run_number }}
